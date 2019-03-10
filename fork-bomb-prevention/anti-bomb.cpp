@@ -22,38 +22,29 @@ std::string exec(char* cmd) {
 
 int main(int argc, char* argv[]){
 	std::string ppid,aux,pgid;
-	int quantMax = atoi(argv[1]);
-		while(1){
+	int max_amount = 60;
+
+	if (argc == 2)
+		max_amount = atoi(argv[1]);
+
+	std::cout << "Baidu is running with process limit: " << max_amount << std::endl;
+
+	while(1){
 		std::string process = exec("ps -e -o ppid,pgid| sort |uniq -c");
 		std::istringstream pass(process);
 		while(pass >> aux){
 			pass >> ppid;
+			int cur_ppid = atoi(ppid.c_str());
 			pass >> pgid;
-			int pqnt = atoi(aux.c_str());
-			if(pqnt > quantMax){
-				std::cout << "Matando " + ppid + " Fork Bomb em potêncial..." << std::endl;
+			int cur_amount = atoi(aux.c_str());
+			if(cur_ppid>1 && cur_amount > max_amount){
+				std::cout << " > Killing fork bomb [" + ppid + "]" << std::endl;
 				aux = "kill -15 -" + pgid;
 				system(aux.c_str());
-				std::cout << "Obrigado por usar Baidu..." << std::endl;
+				//std::cout << "Obrigado por usar Baidu..." << std::endl;
 			}
 		}
 	}
-	// int ppid;
-	/*
-	while(ppid != 1){ 
-		ppid = getppid();
-		std::cout << ppid << std::endl;
-	}*/
-
-	//while(std::cin >> system("pstree /proc/"))
-	// std::string line;
-	// std::istringstream ina(exec("ps ax | perl -nle 'print $1 if /^ *([0-9]+)/'"));
-
-	// while ( std::getline(ina, line)){
-	// 	std::cout << line << std::endl;
-	// }
-
-	//std::cout << 
 
 return 0;
 }
