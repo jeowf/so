@@ -23,7 +23,7 @@ std::string exec(char* cmd) {
 int main(int argc, char* argv[]){
 	std::string ppid,aux,pgid;
 	int quantMax = atoi(argv[1]);
-		while(true){
+		while(1){
 		std::string process = exec("ps -e -o ppid,pgid| sort |uniq -c");
 		std::istringstream pass(process);
 		while(pass >> aux){
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]){
 			int pqnt = atoi(aux.c_str());
 			if(pqnt > quantMax){
 				std::cout << "Matando " + ppid + " Fork Bomb em potêncial..." << std::endl;
-				aux = "pkill -9 -g " + pgid;
+				aux = "kill -15 -" + pgid;
 				system(aux.c_str());
 				std::cout << "Obrigado por usar Baidu..." << std::endl;
 			}
