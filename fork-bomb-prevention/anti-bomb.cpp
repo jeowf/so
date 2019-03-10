@@ -7,22 +7,38 @@
 #include <array>
 #include <sstream>
 
-
-std::string exec(const char* cmd) {
-    std::array<char, 128> buffer;
-    std::string result;
-    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
-    if (!pipe) {
-        throw std::runtime_error("popen() failed!");
+std::string exec(char* cmd) {
+    FILE* pipe = popen(cmd, "r");
+    if (!pipe) return "ERROR";
+    char buffer[128];
+    std::string result = "";
+    while(!feof(pipe)) {
+        if(fgets(buffer, 128, pipe) != NULL)
+            result += buffer;
     }
-    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-        result += buffer.data();
-    }
+    pclose(pipe);
     return result;
 }
 
-int main(){
-	int ppid;
+int main(int argc, char* argv[]){
+	std::string ppid,aux,pgid;
+	int quantMax = atoi(argv[1]);
+		while(true){
+		std::string process = exec("ps -e -o ppid,pgid| sort |uniq -c");
+		std::istringstream pass(process);
+		while(pass >> aux){
+			pass >> ppid;
+			pass >> pgid;
+			int pqnt = atoi(aux.c_str());
+			if(pqnt > quantMax){
+				std::cout << "Matando " + ppid + " Fork Bomb em potêncial..." << std::endl;
+				aux = "pkill -9 -g " + pgid;
+				system(aux.c_str());
+				std::cout << "Obrigado por usar Baidu..." << std::endl;
+			}
+		}
+	}
+	// int ppid;
 	/*
 	while(ppid != 1){ 
 		ppid = getppid();
@@ -30,14 +46,14 @@ int main(){
 	}*/
 
 	//while(std::cin >> system("pstree /proc/"))
-	std::string line;
-	std::istringstream ina(exec("ps ax | perl -nle 'print $1 if /^ *([0-9]+)/'"));
+	// std::string line;
+	// std::istringstream ina(exec("ps ax | perl -nle 'print $1 if /^ *([0-9]+)/'"));
 
-	while ( std::getline(ina, line)){
-		std::cout << line << std::endl;
-	}
+	// while ( std::getline(ina, line)){
+	// 	std::cout << line << std::endl;
+	// }
 
 	//std::cout << 
 
-
+return 0;
 }
